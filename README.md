@@ -1,4 +1,4 @@
-🍔 PizzaMia - Frontend
+# 🍔 PizzaMia - Frontend
 
 Este repositorio contiene el **frontend** de **PizzaMia**, una plataforma web de pedidos y gestión para un local de comida rápida. Está dividido en dos aplicaciones:
 
