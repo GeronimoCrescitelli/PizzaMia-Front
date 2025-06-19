@@ -61,19 +61,17 @@ cd cliente
 ## 📌 Requisitos
 
 - Node.js 18 o superior
-- Backend en funcionamiento en: [http://localhost:8080]
-- Variables de entorno configuradas con la siguiente estructura dentro del cliente: 
+- Backend en funcionamiento en: http://localhost:8080
+- Variables de entorno configuradas con la siguiente estructura dentro del cliente, como archivo `.env`: 
 
 ```
 VITE_AUTH0_DOMAIN=ejemplo
 VITE_AUTH0_CLIENT_ID=example
-
 VITE_AUTH0_CALLBACK_URL=http://localhost:5173/callback
-
 VITE_AUTH0_AUDIENCE=https://pruebaApi
-
 VITE_API_SERVER_URL=http://localhost:8080
 ```
+--
 
 ## Integrantes
 Castillo, Franco
