@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './AddAddressModal.module.css';
 import { DomicilioCreateRequest, LocalidadApi, DomicilioApi } from '../../types/typesClient';
-import { obtenerTodasLasLocalidades } from '../../api/clientApi';
-import { useAuthStore } from '../../store/authStore';
 
 interface AddAddressModalProps {
     isOpen: boolean;
@@ -14,6 +12,15 @@ interface AddAddressModalProps {
     domicilioToEdit?: DomicilioApi | null;
 }
 
+// Mock de localidades - luego podrás reemplazar con una API call
+const mockLocalidades: LocalidadApi[] = [
+    { id: 1, nombre: "Mendoza", provincia: { id: 1, nombre: "Mendoza" } },
+    { id: 2, nombre: "Las Heras", provincia: { id: 1, nombre: "Mendoza" } },
+    { id: 3, nombre: "Godoy Cruz", provincia: { id: 1, nombre: "Mendoza" } },
+    { id: 4, nombre: "Maipú", provincia: { id: 1, nombre: "Mendoza" } },
+    { id: 5, nombre: "San Rafael", provincia: { id: 1, nombre: "Mendoza" } },
+];
+
 const AddAddressModal: React.FC<AddAddressModalProps> = ({
     isOpen,
     onClose,
@@ -22,8 +29,6 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({
     isEditing = false,
     domicilioToEdit = null
 }) => {
-    const token = useAuthStore(state => state.token);
-    
     const [formData, setFormData] = useState<DomicilioCreateRequest>({
         calle: '',
         numero: 0,
@@ -33,45 +38,7 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({
     });
 
     const [errors, setErrors] = useState<{[key: string]: string}>({});
-    const [localidades, setLocalidades] = useState<LocalidadApi[]>([]);
-    const [loadingLocalidades, setLoadingLocalidades] = useState(false);
-    const [errorLocalidades, setErrorLocalidades] = useState<string>('');
-
-    // Cargar localidades desde la API
-    useEffect(() => {
-        const cargarLocalidades = async () => {
-            setLoadingLocalidades(true);
-            setErrorLocalidades('');
-            
-            try {
-                console.log('Cargando localidades desde la API...');
-                const localidadesData = await obtenerTodasLasLocalidades(token || undefined);
-                setLocalidades(localidadesData);
-                console.log('Localidades cargadas:', localidadesData.length);
-            } catch (error) {
-                console.error('Error al cargar localidades:', error);
-                setErrorLocalidades('Error al cargar las localidades. Intenta nuevamente.');
-                
-                // Fallback a localidades mock en caso de error
-                const mockLocalidades: LocalidadApi[] = [
-                    { id: 1, nombre: "Mendoza", provincia: { id: 1, nombre: "Mendoza" } },
-                    { id: 2, nombre: "Las Heras", provincia: { id: 1, nombre: "Mendoza" } },
-                    { id: 3, nombre: "Godoy Cruz", provincia: { id: 1, nombre: "Mendoza" } },
-                    { id: 4, nombre: "Maipú", provincia: { id: 1, nombre: "Mendoza" } },
-                    { id: 5, nombre: "San Rafael", provincia: { id: 1, nombre: "Mendoza" } },
-                ];
-                setLocalidades(mockLocalidades);
-                console.log('Usando localidades mock como fallback');
-            } finally {
-                setLoadingLocalidades(false);
-            }
-        };
-
-        // Solo cargar localidades cuando el modal esté abierto
-        if (isOpen) {
-            cargarLocalidades();
-        }
-    }, [isOpen, token]);
+    const [localidades] = useState<LocalidadApi[]>(mockLocalidades);
 
     // Resetear o cargar formulario cuando se abre el modal
     useEffect(() => {
@@ -129,7 +96,7 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({
         }
     };
 
-    // Validar formulario
+    // Validar formulario (misma validación que antes)
     const validateForm = (): boolean => {
         const newErrors: {[key: string]: string} = {};
 
@@ -174,28 +141,6 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({
     const handleOverlayClick = (e: React.MouseEvent) => {
         if (e.target === e.currentTarget) {
             onClose();
-        }
-    };
-
-    // Reintentar carga de localidades
-    const handleRetryLocalidades = () => {
-        if (isOpen) {
-            // Trigger el useEffect de carga de localidades
-            const event = new Event('localidades-retry');
-            window.dispatchEvent(event);
-            
-            // Recargar manualmente
-            setLoadingLocalidades(true);
-            obtenerTodasLasLocalidades(token || undefined)
-                .then(data => {
-                    setLocalidades(data);
-                    setErrorLocalidades('');
-                })
-                .catch(error => {
-                    console.error('Error al reintentar carga de localidades:', error);
-                    setErrorLocalidades('Error al cargar las localidades. Intenta nuevamente.');
-                })
-                .finally(() => setLoadingLocalidades(false));
         }
     };
 
@@ -278,36 +223,18 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({
                         <label htmlFor="localidad" className={styles.label}>
                             Localidad *
                         </label>
-                        
-                        {/* Mensaje de error de carga de localidades */}
-                        {errorLocalidades && (
-                            <div className={styles.errorMessage}>
-                                <span>{errorLocalidades}</span>
-                                <button 
-                                    type="button" 
-                                    className={styles.retryButton}
-                                    onClick={handleRetryLocalidades}
-                                    disabled={loadingLocalidades}
-                                >
-                                    {loadingLocalidades ? 'Cargando...' : 'Reintentar'}
-                                </button>
-                            </div>
-                        )}
-                        
                         <select
                             id="localidad"
                             name="localidad"
                             value={formData.localidad.id}
                             onChange={handleInputChange}
                             className={`${styles.select} ${errors.localidad ? styles.inputError : ''}`}
-                            disabled={isLoading || loadingLocalidades}
+                            disabled={isLoading}
                         >
-                            <option value={0}>
-                                {loadingLocalidades ? 'Cargando localidades...' : 'Seleccionar localidad'}
-                            </option>
+                            <option value={0}>Seleccionar localidad</option>
                             {localidades.map((localidad) => (
                                 <option key={localidad.id} value={localidad.id}>
-                                    {localidad.nombre} - {localidad.provincia?.nombre || 'Sin provincia'}
+                                    {localidad.nombre} - {localidad.provincia?.nombre}
                                 </option>
                             ))}
                         </select>
@@ -326,7 +253,7 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({
                         <button
                             type="submit"
                             className={styles.submitButton}
-                            disabled={isLoading || loadingLocalidades}
+                            disabled={isLoading}
                         >
                             {isLoading ? (
                                 <>
