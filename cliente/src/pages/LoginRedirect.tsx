@@ -1,14 +1,15 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { useAuthStore } from "../store/useAuthStore";
+import axios from "axios";
+import { useAuthStore } from "../store/authStore";
 import { useShallow } from "zustand/shallow";
 
 const VITE_AUTH0_AUDIENCE = import.meta.env.VITE_AUTH0_AUDIENCE;
-const ALLOWED_ROLES = ["Administrador", "Cajero", "Cocinero", "Delivery"]; // Definir roles permitidos
+const ALLOWED_ROLES = ["Cliente"];
 
 export const LoginRedirect = () => {
-  const { user, isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0();
+  const { user, isAuthenticated, isLoading, getAccessTokenSilently, error } = useAuth0();
   const [isChecking, setIsChecking] = useState(true);
 
   const { setRol, setToken } = useAuthStore(
@@ -20,13 +21,33 @@ export const LoginRedirect = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const checkRol = async () => {
-      if (isLoading || !isAuthenticated || !user) {
-        setIsChecking(false);
+    const checkUserInDB = async () => {
+      if (isLoading) {
+        return;
+      }
+
+      // Verificar si hay errores de Auth0 (usuarios bloqueados)
+      if (error) {
+        console.error("Error en LoginRedirect:", error);
+        
+        if (error.message?.includes('blocked') || 
+            error.message?.includes('account_blocked')) {
+          navigate("/user-blocked");
+          return;
+        }
+        
+        // Otros errores
+        navigate("/?error=auth_error");
+        return;
+      }
+
+      if (!isAuthenticated || !user) {
+        navigate("/");
         return;
       }
       
-      const rol = user[`${VITE_AUTH0_AUDIENCE}/roles`]?.[0]; // extraer rol del token custom claim o user object
+      const sub = user.sub;
+      const rol = user[`${VITE_AUTH0_AUDIENCE}/roles`]?.[0];
   
       try {
         // Verificar si el rol es permitido
@@ -38,41 +59,66 @@ export const LoginRedirect = () => {
 
         const token = await getAccessTokenSilently();
         setToken(token);
-        setRol(rol);
-        if (rol === "Cajero") {
-          navigate("/admin/gestion"); // Redirigir a la sección de insumos
-        } else if (rol === "Cocinero") {
-          navigate("/admin/gestion"); // Redirigir a la sección de productos
+        
+        if (!rol) {
+          setRol(null);
+          const response = await axios.post(
+            `http://localhost:8080/api/clientes/getUserById`,
+            {
+              auth0Id: sub,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          
+          console.log("Respuesta del backend:", response.data);
+          
+          if (!response.data) {
+            navigate("/post-login");
+          } else {
+            setRol("Cliente");
+            navigate("/menu");
+          }
+        } else {
+          setRol(rol);
+          navigate("/menu");
         }
-        else if (rol === "Delivery") {
-          navigate("/admin/gestion"); // Redirigir a la sección de promociones
-        }
-        else if (rol === "Administrador"){
-          navigate("/admin/administracion/roles"); 
-        }
-
-        setIsChecking(false);
         
       } catch (error: any) {
-          console.error("Error al consultar usuario", error);
+        console.error("Error al consultar usuario:", error);
+        
+        // Verificar si es error de usuario bloqueado en el backend
+        if (error.response?.status === 403 && 
+            error.response?.data?.message?.includes('blocked')) {
+          navigate("/user-blocked");
+          return;
+        }
+        
+        if (error.response?.status === 404 && !rol) {
+          navigate("/post-login");
+        } else {
           navigate("/");
-      } 
+        }
+      } finally {
+        setIsChecking(false);
+      }
     };
 
-    checkRol();
-  }, [isAuthenticated, isLoading, user]);
+    checkUserInDB();
+  }, [isAuthenticated, isLoading, user, error]);
 
   if (isLoading || isChecking) {
     return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "50dvh",
-        }}
-      >
+      <div style={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "50dvh",
+      }}>
         <h2>Verificando acceso...</h2>
         <div style={{ 
           width: '40px', 
@@ -94,15 +140,13 @@ export const LoginRedirect = () => {
   }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: "50dvh",
-      }}
-    >
+    <div style={{
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+      minHeight: "50dvh",
+    }}>
       <h2>Redirigiendo...</h2>
     </div>
   );

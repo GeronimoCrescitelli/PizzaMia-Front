@@ -1,0 +1,582 @@
+/*------------------------------
+GestionTable
+------------------------------*/
+.gestionTableContainer {
+    width: 95%;
+}
+
+/* Badge de estado */
+.estadoBadge {
+    color: #fff;
+    border-radius: 8px;
+    padding: 4px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    display: inline-block;
+    min-width: 110px;
+    text-align: center;
+}
+
+/* Modal de acciones */
+.accionesModal {
+    position: absolute;
+    top: 38px;
+    right: 0;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    padding: 8px 12px;
+    z-index: 10;
+    min-width: 80px;
+}
+
+.accionBtn {
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    transition: background 0.15s;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+}
+
+.accionBtn:hover {
+    background: #f5f5f5;
+}
+
+/*------------------------------
+HeaderFilterGestion
+------------------------------*/
+.headerGestionContainer {
+    width: 100%;
+    margin-bottom: 24px;
+}
+
+.headerGestionTitleRow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.headerGestionTitle {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #222;
+    margin: 0;
+}
+
+.headerGestionFiltersRow {
+    display: flex;
+    align-items: center;      /* Centra verticalmente los elementos */
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;  /* Centra horizontalmente toda la fila */
+    min-height: 56px;         /* Altura mínima para mejor alineación */
+}
+
+.headerGestionLabel {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-right: 4px;
+}
+
+.headerGestionSelect {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #bfc9d9;
+    font-size: 1rem;
+    background: #f7faff;
+    min-width: 120px;
+}
+
+.headerGestionInput {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #bfc9d9;
+    font-size: 1rem;
+    background: #f7faff;
+    min-width: 180px;
+    margin-left: 20px;
+}
+
+.headerGestionFiltersRight {
+  margin-top: 2px;
+}
+
+/*------------------------------
+EstadoBadge y EstadoOptions
+------------------------------*/
+.estadoContainer {
+    position: relative;
+    display: inline-block;
+}
+
+.estadoBadgeClickable {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.estadoBadgeClickable:hover {
+    transform: scale(1.05);
+}
+
+.estadoOptionsModal {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 10;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 8px;
+    margin-top: 8px;
+    width: max-content;
+    min-width: 140px;
+}
+
+.estadoOption {
+    padding: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border-radius: 4px;
+}
+
+.estadoOption:hover {
+    background-color: #f5f5f5;
+}
+
+.estadoOption .estadoBadge {
+    width: 100%;
+    text-align: center;
+}
+
+/*------------------------------
+Loading, Error y Mensajes Vacíos
+------------------------------*/
+.loadingContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    font-size: 16px;
+    color: #666;
+}
+
+.errorContainer {
+    background-color: #ffebee;
+    color: #d32f2f;
+    padding: 16px;
+    border-radius: 8px;
+    margin: 20px 0;
+    text-align: center;
+}
+
+.paginationInfo {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.emptyMessage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  width: 100%;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  color: #666;
+  font-size: 16px;
+  text-align: center;
+}
+
+/*------------------------------
+Rol Indicator y Estados
+------------------------------*/
+.rolIndicator {
+  background-color: #f0f0f0;
+  color: #333;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  margin-left: 10px;
+}
+
+/* Estados específicos por color */
+.estadoEspera {
+  background-color: #D64C4C;
+}
+
+.estadoCocina {
+  background-color: #4A90E2;
+}
+
+.estadoPreparacion {
+  background-color: #FAAE42;
+}
+
+.estadoListo {
+  background-color: #5ACD40;
+}
+
+.estadoFacturado {
+  background-color: #8A2BE2;
+}
+
+.estadoCancelado {
+  background-color: #FF6B6B;
+}
+
+/*------------------------------
+Connection Status
+------------------------------*/
+.connectionStatus {
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  text-align: center;
+  margin-bottom: 10px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.connected {
+  background-color: #e6f7e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+.disconnected {
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+/*------------------------------
+Animación de Fila Destacada
+------------------------------*/
+.highlightedRow {
+  animation: highlight 2s ease-in-out;
+}
+
+@keyframes highlight {
+  0% {
+    background-color: rgba(255, 214, 102, 0.5);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+/*------------------------------
+VerPedidoModal
+------------------------------*/
+.verPedidoModalContent {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  padding: 0;
+  width: 90%;
+  max-width: 800px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.verPedidoModalHeader {
+  padding: 16px 20px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8f9fa;
+}
+
+.verPedidoModalHeader h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.estadoPedido {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  background-color: #4A90E2;
+  color: white;
+}
+
+.verPedidoModalBody {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.pedidoInfoSection {
+  margin-bottom: 25px;
+}
+
+.pedidoInfoSection h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 1.2rem;
+  color: #444;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+}
+
+.pedidoInfoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.pedidoInfoGrid div {
+  padding: 8px 0;
+}
+
+.pedidoDetallesTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.pedidoDetallesTable th {
+  background-color: #f4f4f4;
+  text-align: left;
+  padding: 10px;
+  font-weight: 600;
+  color: #555;
+}
+
+.pedidoDetallesTable td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.pedidoDetallesTable tr:last-child td {
+  border-bottom: none;
+}
+
+.articuloDescripcion {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 5px;
+}
+
+.pedidoTotales {
+  margin-top: 20px;
+  border-top: 1px solid #eee;
+  padding-top: 15px;
+}
+
+.pedidoTotalItem {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+
+.pedidoTotalFinal {
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin-top: 10px;
+  border-top: 1px dashed #ddd;
+  padding-top: 10px;
+}
+
+.verPedidoModalFooter {
+  padding: 15px 20px;
+  border-top: 1px solid #eee;
+  text-align: right;
+  background-color: #f8f9fa;
+}
+
+/*------------------------------
+Responsive: Mobile
+------------------------------*/
+@media (max-width: 900px) {
+
+    /* GestionTable */
+    .rolesTable {
+        min-width: 600px;
+        width: max-content;
+        font-size: 14px;
+    }
+    .tableHeader,
+    td {
+        font-size: 14px;
+        padding: 8px 6px;
+        white-space: nowrap;
+    }
+
+    /* HeaderFilterGestion */
+    .headerGestionFiltersRow {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 0;
+        width: 100%;
+        padding-bottom: 4px;
+    }
+
+    .headerGestionFiltersLeft,
+    .headerGestionFiltersRight {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 48%;
+        min-width: 0;
+    }
+
+    .headerGestionFiltersLeft {
+        align-items: flex-start;
+    }
+
+    .headerGestionFiltersRight {
+        margin-top: 25px;
+        align-items: flex-end;
+    }
+
+    .headerGestionLabel,
+    .headerGestionSelect,
+    .headerGestionInput {
+        font-size: 13px;
+        min-width: 0;
+        width: 100%;
+        max-width: 350px;
+        box-sizing: border-box;
+        text-align: left;
+    }
+
+    .headerGestionInput {
+        min-width: 0;
+        width: 100%;
+        max-width: 350px;
+        margin-left: 0; 
+    }
+
+}
+
+/*------------------------------
+VerPedidoModal - Responsive: Mobile (minimalista y centrado)
+------------------------------*/
+@media (max-width: 900px) {
+    .verPedidoModalContent {
+        width: 96vw;
+        max-width: 96vw;
+        min-width: 0;
+        padding: 0;
+        border-radius: 10px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+        height: auto;
+        max-height: 96vh;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        position: relative;
+        margin: 0; /* Centrado vertical y horizontal */
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        transform: none; /* Elimina el translate para evitar desplazamiento */
+    }
+
+    .verPedidoModalHeader {
+        padding: 12px 10px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        border-radius: 10px 10px 0 0;
+        background: #f8f9fa;
+    }
+
+    .verPedidoModalHeader h2 {
+        font-size: 1.1rem;
+        text-align: left;
+        margin: 0;
+        color: #222;
+        font-weight: 600;
+    }
+
+    .estadoPedido {
+        font-size: 0.9rem;
+        padding: 4px 10px;
+        margin-top: 2px;
+        border-radius: 12px;
+    }
+
+    .verPedidoModalBody {
+        padding: 10px 8px;
+        font-size: 14px;
+        background: #fff;
+    }
+
+    .pedidoInfoSection h3 {
+        font-size: 1rem;
+        padding-bottom: 4px;
+        margin-bottom: 6px;
+    }
+
+    .pedidoInfoGrid {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+    .pedidoDetallesTable {
+        font-size: 13px;
+        margin-top: 6px;
+        min-width: 340px;
+        width: max-content;
+        overflow-x: auto;
+        display: block;
+        background: #fff;
+    }
+
+    .pedidoDetallesTable th,
+    .pedidoDetallesTable td {
+        padding: 6px 4px;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    .pedidoTotales {
+        padding-top: 8px;
+        margin-top: 8px;
+    }
+
+    .pedidoTotalItem {
+        font-size: 14px;
+        padding: 5px 0;
+    }
+
+    .pedidoTotalFinal {
+        font-size: 1rem;
+        padding-top: 6px;
+    }
+
+    .verPedidoModalFooter {
+        padding: 10px 8px;
+        border-radius: 0 0 10px 10px;
+        background: #f8f9fa;
+        text-align: right;
+    }
+}

@@ -8,7 +8,7 @@ const AccessDenied: React.FC = () => {
   useEffect(() => {
     // Establecer un temporizador para cerrar sesión automáticamente después de 5 segundos
     const timer = setTimeout(() => {
-      logout({ logoutParams: { returnTo: window.location.origin } });
+      logout({ logoutParams: { returnTo: `${window.location.origin}/` } });
     }, 5000);
     
     return () => clearTimeout(timer);
@@ -59,7 +59,7 @@ const AccessDenied: React.FC = () => {
           marginBottom: '1.5rem',
           color: '#333'
         }}>
-          Lo sentimos, esta aplicación solo está disponible para usuarios con rol <strong>Cliente</strong>.
+          Lo sentimos, esta aplicación solo está disponible para usuarios con rol <strong>Administrador, Cajero, Cocinero o Delivery</strong>.
         </p>
         
         <p style={{

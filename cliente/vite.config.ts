@@ -1,19 +1,17 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import fs from 'fs'
+import path from 'path'
+
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-
-  define: {
-    // Proporcionar un polyfill para 'global'
-    global: 'globalThis',
-  },
-  
   server: {
-    proxy: {
-      '/api': 'http://localhost:8080', // Apunta al backend real
+    https: {
+      key: fs.readFileSync(path.resolve(__dirname, 'ssl/key.pem')),
+      cert: fs.readFileSync(path.resolve(__dirname, 'ssl/cert.pem')),
     },
-    port: 5174
+    port: 5173,
   }
 })

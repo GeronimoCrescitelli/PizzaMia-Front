@@ -1,7 +1,7 @@
-import chevronUp from "../../assets/admin/circle-chevron-up.svg";
-import chevronDown from "../../assets/admin/circle-chevron-down.svg";
-import iconEdit from "../../assets/admin/icon-edit.svg";
-import styles from "./getGenericColumns.module.css";
+import chevronUp from "../../assets/icons/circle-chevron-up.svg";
+import chevronDown from "../../assets/icons/circle-chevron-down.svg";
+import iconEdit from "../../assets/icons/icon-edit.svg";
+import styles from "./getGenericColumns.module.css"; // Ajusta la ruta si es necesario
 
 export const getGenericColumns = ({
     onAlta,
@@ -33,42 +33,28 @@ export const getGenericColumns = ({
         ),
     },
     {
-        header: "Alta",
-        key: "alta",
-        render: (_: any, row: any, rowIndex: number) => (
-            <button
-                className={styles.actionButton}
-                onClick={() => onAlta(row, rowIndex)}
-                disabled={disabledAlta(row)}
-                type="button"
-            >
-                <img
-                    src={chevronUp}
-                    alt="Alta"
-                    className={styles.actionIcon}
-                    style={{ opacity: disabledAlta(row) ? 0.4 : 1 }}
-                />
-            </button>
-        ),
-    },
-    {
-        header: "Baja",
-        key: "baja",
-        render: (_: any, row: any, rowIndex: number) => (
-            <button
-                className={styles.actionButton}
-                onClick={() => onBaja(row, rowIndex)}
-                disabled={disabledBaja(row)}
-                type="button"
-            >
-                <img
-                    src={chevronDown}
-                    alt="Baja"
-                    className={styles.actionIcon}
-                    style={{ opacity: disabledBaja(row) ? 0.4 : 1 }}
-                />
-            </button>
-        ),
+        header: "Cambiar Estado",
+        key: "cambiarEstado",
+        render: (_: any, row: any, rowIndex: number) => {
+            const isActive = row[estadoKey] === "Activo";
+            const disabled = isActive ? disabledBaja(row) : disabledAlta(row);
+            
+            return (
+                <button
+                    className={styles.actionButton}
+                    onClick={() => isActive ? onBaja(row, rowIndex) : onAlta(row, rowIndex)}
+                    disabled={disabled}
+                    type="button"
+                >
+                    <img
+                        src={isActive ? chevronDown : chevronUp}
+                        alt={isActive ? "Dar de Baja" : "Dar de Alta"}
+                        className={styles.actionIcon}
+                        style={{ opacity: disabled ? 0.4 : 1 }}
+                    />
+                </button>
+            );
+        },
     },
     {
         header: "Editar",

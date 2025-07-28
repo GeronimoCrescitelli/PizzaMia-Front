@@ -2,33 +2,42 @@ import React, { useEffect, useState } from "react";
 import styles from "./Menu.module.css";
 import Header from "../Header/Header";
 import ItemCard from "../ItemCard/ItemCard";
+import PromocionCard from "../PromocionCard/PromocionCard"; // Importar el nuevo componente
 import CartDrawer from "../modules/SideCarrito/CartDrawer";
 import {
   obtenerTodosLosRubros,
   obtenerManufacturadosPorRubro,
   obtenerInsumosNoElaborables,
+  obtenerPromocionesActivas, // Importar la función para obtener promociones
 } from "../../../api/clientApi";
 import {
   ArticuloManufacturadoApi,
   InsumoApi,
-  RubroApi
+  RubroApi,
+  PromocionApi, // Importar el tipo para promociones
 } from "../../../types/typesClient";
 import { useCartStore } from "../../../store/cartStore";
 import { useClienteStore } from '../../../store/clienteStore';
 
-// Definir tipo para los items que mostramos
+// Ampliar el tipo para incluir promociones
 type MenuItemType = {
   item: ArticuloManufacturadoApi | InsumoApi;
   esManufacturado: boolean;
 };
 
+// Tipo separado para promociones
+type PromocionItemType = {
+  item: PromocionApi;
+};
+
 const ITEMS_PER_PAGE = 6;
 
-// Nombres de los rubros que queremos mostrar (sin acento en "Bebidas no alcoholicas")
+// Nombres de los rubros que queremos mostrar 
 const RUBROS_A_MOSTRAR = ["Pizzas", "Bebidas no alcoholicas"];
 
-// Valor especial para la opción "Todos"
+// Valor especial para la opción "Todos" y "Promociones"
 const TODOS_ID = "todos";
+const PROMOCIONES_ID = "promociones";
 
 const Menu: React.FC = () => {
   // Estado de la UI
@@ -46,6 +55,7 @@ const Menu: React.FC = () => {
   const [allItems, setAllItems] = useState<MenuItemType[]>([]);
   const [pizzaItems, setPizzaItems] = useState<MenuItemType[]>([]);
   const [bebidaItems, setBebidaItems] = useState<MenuItemType[]>([]);
+  const [promociones, setPromociones] = useState<PromocionItemType[]>([]); // Nuevo estado para promociones
   const [loading, setLoading] = useState(true);
   
   // Estado de paginación
@@ -54,6 +64,11 @@ const Menu: React.FC = () => {
 
   // Usar el store del cliente
   const cargarCliente = useClienteStore(state => state.cargarCliente);
+  
+  // Función para filtrar elementos activos (fechaBaja === null) - SOLO PARA PRODUCTOS
+  const filterActiveItems = <T extends { fechaBaja: string | null }>(items: T[]): T[] => {
+    return items.filter(item => item.fechaBaja === null);
+  };
   
   // Cargar datos del cliente al montar el componente
   useEffect(() => {
@@ -89,7 +104,7 @@ const Menu: React.FC = () => {
     loadRubros();
   }, []);
   
-  // Cargar datos para cada rubro específicamente
+  // Cargar datos para cada rubro específicamente y promociones
   useEffect(() => {
     if (rubros.length === 0) return;
     
@@ -119,12 +134,15 @@ const Menu: React.FC = () => {
             "denominacion"
           );
           
-          pizzas = pizzasRes.content.map(item => ({ 
+          // Filtrar solo pizzas activas (fechaBaja === null)
+          const pizzasActivas = filterActiveItems(pizzasRes.content);
+          
+          pizzas = pizzasActivas.map(item => ({ 
             item, 
             esManufacturado: true 
           }));
           
-          console.log("Pizzas cargadas:", pizzas.length);
+          console.log("Pizzas cargadas (activas):", pizzas.length);
         }
         
         if (bebidaRubro) {
@@ -136,12 +154,26 @@ const Menu: React.FC = () => {
             bebidaRubro.id as number
           );
           
-          bebidas = bebidasRes.content.map(item => ({ 
+          // Filtrar solo bebidas activas (fechaBaja === null)
+          const bebidasActivas = filterActiveItems(bebidasRes.content);
+          
+          bebidas = bebidasActivas.map(item => ({ 
             item, 
             esManufacturado: false 
           }));
           
-          console.log("Bebidas cargadas:", bebidas.length);
+          console.log("Bebidas cargadas (activas):", bebidas.length);
+        }
+        
+        // Cargar promociones activas (SIN FILTRO fechaBaja)
+        try {
+          const promocionesData = await obtenerPromocionesActivas();
+          const promocionesItems = promocionesData.map(item => ({ item }));
+          setPromociones(promocionesItems);
+          console.log("Promociones cargadas:", promocionesItems.length);
+        } catch (error) {
+          console.error("Error al cargar promociones:", error);
+          setPromociones([]);
         }
         
         // Guardar por separado para la vista "Todos"
@@ -175,6 +207,11 @@ const Menu: React.FC = () => {
       return;
     }
     
+    // Si es "Promociones", no necesitamos hacer otra petición
+    if (activeRubro === PROMOCIONES_ID) {
+      return;
+    }
+    
     // Si no es un número, no hacer nada
     if (typeof activeRubro !== 'number') return;
     
@@ -186,33 +223,59 @@ const Menu: React.FC = () => {
         const esRubroPizzas = rubros.find(r => r.id === activeRubro)?.denominacion === "Pizzas";
         
         if (esRubroPizzas) {
-          // Cargar manufacturados (pizzas)
+          // Cargar TODOS los manufacturados del rubro para filtrar correctamente
           const manuRes = await obtenerManufacturadosPorRubro(
             activeRubro, 
-            currentPage, 
-            ITEMS_PER_PAGE, 
+            0, // Cargar desde página 0
+            100, // Cargar muchos elementos (ajustar según necesidad)
             "denominacion"
           );
           
-          setMenuItems(manuRes.content.map(item => ({ 
+          // Filtrar solo manufacturados activos (fechaBaja === null)
+          const manufacturadosActivos = filterActiveItems(manuRes.content);
+          
+          // Calcular paginación correcta basada en elementos activos
+          const totalActivosElements = manufacturadosActivos.length;
+          const totalActivosPages = Math.ceil(totalActivosElements / ITEMS_PER_PAGE);
+          
+          // Obtener elementos para la página actual
+          const startIndex = currentPage * ITEMS_PER_PAGE;
+          const endIndex = startIndex + ITEMS_PER_PAGE;
+          const paginatedItems = manufacturadosActivos.slice(startIndex, endIndex);
+          
+          setMenuItems(paginatedItems.map(item => ({ 
             item, 
             esManufacturado: true 
           })));
-          setTotalPages(manuRes.totalPages);
+          
+          setTotalPages(totalActivosPages || 1);
         } else {
-          // Cargar insumos (bebidas)
+          // Cargar TODOS los insumos del rubro para filtrar correctamente
           const insuRes = await obtenerInsumosNoElaborables(
-            currentPage, 
-            ITEMS_PER_PAGE, 
+            0, // Cargar desde página 0
+            100, // Cargar muchos elementos (ajustar según necesidad)
             "denominacion", 
             activeRubro
           );
           
-          setMenuItems(insuRes.content.map(item => ({ 
+          // Filtrar solo insumos activos (fechaBaja === null)
+          const insumosActivos = filterActiveItems(insuRes.content);
+          
+          // Calcular paginación correcta basada en elementos activos
+          const totalActivosElements = insumosActivos.length;
+          const totalActivosPages = Math.ceil(totalActivosElements / ITEMS_PER_PAGE);
+          
+          // Obtener elementos para la página actual
+          const startIndex = currentPage * ITEMS_PER_PAGE;
+          const endIndex = startIndex + ITEMS_PER_PAGE;
+          const paginatedItems = insumosActivos.slice(startIndex, endIndex);
+          
+          setMenuItems(paginatedItems.map(item => ({ 
             item, 
             esManufacturado: false 
           })));
-          setTotalPages(insuRes.totalPages);
+          
+          setTotalPages(totalActivosPages || 1);
         }
       } catch (error) {
         console.error("Error al cargar productos por rubro:", error);
@@ -224,7 +287,7 @@ const Menu: React.FC = () => {
     };
     
     loadItemsByRubro();
-  }, [activeRubro, currentPage, rubros]);
+  }, [activeRubro, currentPage, rubros, allItems]);
   
   // Resetear página cuando cambia el rubro
   useEffect(() => {
@@ -240,10 +303,20 @@ const Menu: React.FC = () => {
     );
   };
   
+  // Filtrado por búsqueda para promociones
+  const getFilteredPromociones = (items: PromocionItemType[]) => {
+    if (!searchQuery.trim()) return items;
+    
+    return items.filter(({ item }) => 
+      item.denominacion?.toLowerCase().includes(searchQuery.toLowerCase()) || false
+    );
+  };
+  
   // Filtrar los items según la búsqueda para cada sección
   const filteredMenuItems = getFilteredItems(menuItems);
   const filteredPizzaItems = getFilteredItems(pizzaItems);
   const filteredBebidaItems = getFilteredItems(bebidaItems);
+  const filteredPromociones = getFilteredPromociones(promociones);
 
   return (
     <div className={styles.productPageDesktop}>
@@ -277,7 +350,18 @@ const Menu: React.FC = () => {
               <div className={styles.categoryLabel}>Todos</div>
             </div>
             
-            {/* Rubros específicos */}
+            {/* Opción "Promociones" - MOVIDA ANTES DE LOS RUBROS */}
+            <div
+              className={`${styles.categoryCard} ${activeRubro === PROMOCIONES_ID ? styles.active : ""}`}
+              onClick={() => setActiveRubro(PROMOCIONES_ID)}
+            >
+              <div className={styles.categoryBackground}>
+                <div className={styles.categoryIcon}>🎁</div>
+              </div>
+              <div className={styles.categoryLabel}>Promociones</div>
+            </div>
+            
+            {/* Rubros específicos - DESPUÉS DE PROMOCIONES */}
             {rubros.map((rubro) => (
               <div
                 key={rubro.id}
@@ -302,9 +386,34 @@ const Menu: React.FC = () => {
               <div className={styles.loadingText}>Cargando...</div>
             </div>
           ) : activeRubro === TODOS_ID ? (
-            // Vista "Todos": mostrar secciones de Pizzas y Bebidas
+            // Vista "Todos": mostrar secciones de Pizzas, Bebidas y Promociones
             <div className={styles.allItemsContainer}>
-              {/* Sección Pizzas */}
+              {/* Sección Promociones - PRIMERA */}
+              {filteredPromociones.length > 0 && (
+                <div className={styles.menuSection}>
+                  <div className={styles.sectionHeader}>
+                    <div className={styles.sectionTitle}>Promociones</div>
+                    {filteredPromociones.length > 6 && (
+                      <button 
+                        className={styles.verMasButton}
+                        onClick={() => setActiveRubro(PROMOCIONES_ID)}
+                      >
+                        Ver más
+                      </button>
+                    )}
+                  </div>
+                  <div className={styles.pizzaGrid}>
+                    {filteredPromociones.slice(0, 6).map(({ item }) => (
+                      <PromocionCard
+                        key={`promo-${item.id}`}
+                        item={item}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* Sección Pizzas - SEGUNDA */}
               {filteredPizzaItems.length > 0 && (
                 <div className={styles.menuSection}>
                   <div className={styles.sectionHeader}>
@@ -333,7 +442,7 @@ const Menu: React.FC = () => {
                 </div>
               )}
               
-              {/* Sección Bebidas */}
+              {/* Sección Bebidas - TERCERA */}
               {filteredBebidaItems.length > 0 && (
                 <div className={styles.menuSection}>
                   <div className={styles.sectionHeader}>
@@ -363,11 +472,35 @@ const Menu: React.FC = () => {
               )}
               
               {/* Mensaje si no hay items que coincidan con la búsqueda */}
-              {filteredPizzaItems.length === 0 && filteredBebidaItems.length === 0 && (
+              {filteredPizzaItems.length === 0 && 
+               filteredBebidaItems.length === 0 && 
+               filteredPromociones.length === 0 && (
                 <div className={styles.emptyState}>
                   {searchQuery.trim() 
                     ? `No se encontraron productos que coincidan con "${searchQuery}".` 
                     : "No se encontraron productos en las categorías seleccionadas."}
+                </div>
+              )}
+            </div>
+          ) : activeRubro === PROMOCIONES_ID ? (
+            // Vista de Promociones
+            <div className={styles.menuSection}>
+              <div className={styles.sectionTitle}>Promociones</div>
+              
+              {filteredPromociones.length > 0 ? (
+                <div className={styles.pizzaGrid}>
+                  {filteredPromociones.map(({ item }) => (
+                    <PromocionCard
+                      key={`promo-${item.id}`}
+                      item={item}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className={styles.emptyState}>
+                  {searchQuery.trim() 
+                    ? `No se encontraron promociones que coincidan con "${searchQuery}".` 
+                    : "No hay promociones disponibles en este momento."}
                 </div>
               )}
             </div>

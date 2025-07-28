@@ -1,145 +1,59 @@
-import { Route, Routes, Navigate } from 'react-router-dom';
-import Dashboard from '../layout/AdminLayout';
-import AccessDenied from '../pages/AccessDenied';
-import { CallbackPage } from '../pages/CallbackPage';
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import Menu from '../pages/menu/Menu/Menu';
 import { LoginRedirect } from '../pages/LoginRedirect';
-import HomePage from '../pages/HomePage';
+import { PostLogin } from '../pages/PostLogin/PostLogin';
+import LandingPage from '../pages/landing/LandingPage';
+import MercadoPagoReturn from '../pages/mercadopago/MercadoPagoReturn';
+import { CallbackPage } from '../pages/CallbackPage';
 import { ProtectedRoute } from '../auth/ProtectedRoute';
+import ClientPage from '../pages/client/ClientPage';
+import AccessDenied from '../pages/AccessDenied';
+
+// Importar componentes de perfil de cliente
+import PersonalInfo from '../pages/client/modules/profile/PersonalInfo';
+import Addresses from '../pages/client/modules/profile/Addresses';
+import Orders from '../pages/client/modules/profile/Orders';
+import ProfileWrapper from '../components/Client/ProfileWrapper/ProfileWrapper';
 import { UserBlocked } from '../pages/UserBlocked';
 
-const AppRoutes = () => {
-    return (
-        <Routes>
-            {/* Rutas públicas */}
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login-redirect" element={<LoginRedirect />} />
-            <Route path="/callback" element={<CallbackPage />} />
-            <Route path="/access-denied" element={<AccessDenied />} />
-            <Route path="/user-blocked" element={<UserBlocked />} />
+const AppRoutes: React.FC = () => {
+  return (
+    <Routes>
+      {/* Rutas públicas */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/menu" element={<Menu />} />
+      <Route path="/login-redirect" element={<LoginRedirect />} />
+      <Route path="/callback" element={<CallbackPage />} />
+      <Route path="/post-login" element={<PostLogin />} />
+      <Route path="/mercadopago/return" element={<MercadoPagoReturn />} />
+      <Route path="/access-denied" element={<AccessDenied />} />
+      <Route path="/user-blocked" element={<UserBlocked />} />
 
 
-            {/* Redirecciones para rutas principales */}
-            <Route 
-                path="/admin/administracion" 
-                element={<Navigate to="/admin/administracion/roles" replace />} 
-            />
-            <Route 
-                path="/admin/rubros" 
-                element={<Navigate to="/admin/rubros/insumos" replace />} 
-            />
+
+      {/* Rutas protegidas del cliente */}
+      <Route
+        path="/client/*"
+        element={
+          <ProtectedRoute allowedRoles={["Cliente"]}>
+            <ProfileWrapper>
+              <Routes>
+              {/* Ruta base del cliente */}
+              <Route index element={<ClientPage />} />
+              
+              {/* Rutas del perfil de usuario */}
+              <Route path="profile/personal-info" element={<PersonalInfo />} />
+              <Route path="profile/addresses" element={<Addresses />} />
+              <Route path="orders" element={<Orders />} />
+            </Routes>
+            </ProfileWrapper>
             
-            {/* Secciones específicas de administración */}
-            <Route 
-                path="/admin/administracion/roles" 
-                element={
-                    <ProtectedRoute allowedRoles={["Administrador"]}>
-                        <Dashboard />
-                    </ProtectedRoute>
-                } 
-            />
-            <Route 
-                path="/admin/administracion/empleados" 
-                element={
-                    <ProtectedRoute allowedRoles={["Administrador"]}>
-                        <Dashboard />
-                    </ProtectedRoute>
-                } 
-            />
-            <Route 
-                path="/admin/administracion/clientes" 
-                element={
-                    <ProtectedRoute allowedRoles={["Administrador"]}>
-                        <Dashboard />
-                    </ProtectedRoute>
-                } 
-            />
-            
-            {/* Secciones específicas de rubros */}
-            <Route 
-                path="/admin/rubros/insumos" 
-                element={
-                    <ProtectedRoute allowedRoles={["Administrador"]}>
-                        <Dashboard />
-                    </ProtectedRoute>
-                } 
-            />
-            <Route 
-                path="/admin/rubros/productos" 
-                element={
-                    <ProtectedRoute allowedRoles={["Administrador"]}>
-                        <Dashboard />
-                    </ProtectedRoute>
-                } 
-            />
-            
-            {/* Rutas específicas para la sección administración incompleta */}
-            <Route 
-                path="/admin/administracion/*" 
-                element={<Navigate to="/admin/administracion/roles" replace />} 
-            />
-            <Route 
-                path="/admin/rubros/*" 
-                element={<Navigate to="/admin/rubros/insumos" replace />} 
-            />
-            
-            {/* Otras rutas del admin */}
-            <Route 
-                path="/admin/insumos" 
-                element={
-                    <ProtectedRoute allowedRoles={["Administrador", "Cocinero"]}>
-                        <Dashboard />
-                    </ProtectedRoute>
-                } 
-            />
-            <Route 
-                path="/admin/productos" 
-                element={
-                    <ProtectedRoute allowedRoles={["Administrador", "Cocinero"]}>
-                        <Dashboard />
-                    </ProtectedRoute>
-                } 
-            />
-            <Route 
-                path="/admin/promociones" 
-                element={
-                    <ProtectedRoute allowedRoles={["Administrador"]}>
-                        <Dashboard />
-                    </ProtectedRoute>
-                } 
-            />
-            
-            {/* Rutas de gestión, estadísticas y seguridad */}
-            <Route 
-                path="/admin/gestion" 
-                element={
-                    <ProtectedRoute allowedRoles={["Cajero", "Cocinero", "Delivery"]}>
-                        <Dashboard />
-                    </ProtectedRoute>
-                } 
-            />
-            <Route 
-                path="/admin/estadisticas" 
-                element={
-                    <ProtectedRoute allowedRoles={["Administrador"]}>
-                        <Dashboard />
-                    </ProtectedRoute>
-                } 
-            />
-            
-            {/* Ruta por defecto para admin */}
-            <Route 
-                path="/admin" 
-                element={
-                    <ProtectedRoute allowedRoles={["Administrador"]}>
-                        <Navigate to="/admin/administracion/roles" replace />
-                    </ProtectedRoute>
-                } 
-            />
-            
-            {/* Captura cualquier otra ruta no definida */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-    );
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
+  );
 };
 
 export default AppRoutes;
