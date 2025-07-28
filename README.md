@@ -71,7 +71,6 @@ VITE_AUTH0_CALLBACK_URL=http://localhost:5173/callback
 VITE_AUTH0_AUDIENCE=https://pruebaApi
 VITE_API_SERVER_URL=http://localhost:8080
 ```
---
 
 ## Integrantes
 Castillo, Franco
