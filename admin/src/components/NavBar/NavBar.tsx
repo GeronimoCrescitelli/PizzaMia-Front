@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./NavBar.module.css";
-import pizzaLogo from "../../assets/icons/pizza.svg";
-import avatarLogo from "../../assets/icons/generic-avatar.svg";
+import pizzaLogo from "../../../assets/admin/pizza.svg";
+import avatarLogo from "../../../assets/admin/generic-avatar.svg";
 import Button from "../Button/Button";
 
 const NavBar: React.FC = () => {

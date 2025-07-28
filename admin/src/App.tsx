@@ -1,12 +1,7 @@
-import AppRoutes from './routes/AppRoutes.tsx';
+import AppRoutes from './routes/AppRoutes'
 
 function App() {
-
-  return (
-    <div className="App">
-      <AppRoutes/>
-    </div>
-  )
+  return <AppRoutes />
 }
 
 export default App

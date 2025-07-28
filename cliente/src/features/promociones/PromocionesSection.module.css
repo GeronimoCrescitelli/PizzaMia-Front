@@ -1,0 +1,377 @@
+/* =========================
+Estilos para la sección de promociones
+========================= */
+
+/* Contenedor principal del área de administración */
+.adminContent {
+    width: 100%;
+    padding: 30px 0;
+}
+
+/* Estilos base para inputs */
+.input {
+    border-radius: 38px;
+    border: 1px solid #d0d0d0;
+    margin-bottom: 12px;
+    min-width: 260px;
+    width: 95%;
+    max-width: 420px;
+    font-size: 16px;
+    padding: 10px 16px;
+    box-sizing: border-box;
+}
+
+.buttonConteiner {
+    width: 60rem;
+    display: flex;
+    justify-content: flex-start;
+    margin: 20px 20px;
+    padding-left: 0; /* Asegura que no haya padding */
+}
+
+/* =========================
+HeaderFilterPromociones Component Styles
+========================= */
+
+.headerFilterContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 30px;
+    padding: 0 24px;
+    box-sizing: border-box;
+}
+
+.headerFilterTopRow {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+}
+
+.headerFilterTitleRow {
+    position: absolute;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none; /* Para que el botón sea clickeable */
+}
+
+.headerFilterTitle {
+    font-size: 18px;
+    color: var(--text-color);
+    font-weight: bold;
+    text-align: center;
+}
+
+.headerFilterButtonRow {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    pointer-events: auto;
+}
+
+.headerFilterFiltersRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.headerFilterLabel {
+    font-size: 15px;
+    color: #444;
+}
+
+.headerFilterDateGroup {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+
+.headerFilterDateLabel {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 2px;
+    margin-left: 2px;
+}
+
+.headerFilterDateInput {
+    border-radius: 8px;
+    border: 1px solid #d0d0d0;
+    font-size: 15px;
+    padding: 6px 10px;
+    min-width: 120px;
+    background: #fafbfc;
+    color: #222;
+    transition: border 0.2s;
+}
+
+.headerFilterDateInput:focus {
+    border: 1.5px solid #4A90E2;
+    outline: none;
+}
+
+/* =========================
+PromocionModal.tsx
+========================= */
+
+/* Modal minimalista y responsivo para crear/editar promoción */
+.modalContent {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    padding: 18px 18px 20px 18px;
+    min-width: 300px;
+    width: auto;
+    margin-bottom: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    overflow: hidden;
+}
+
+/* Layout de columnas individuales */
+.editarModalCol {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+}
+
+/* Contenedor para los detalles de productos/insumos, con scroll vertical si hay muchos items */
+.detallesContainer {
+    max-height: 260px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Fila individual de detalle de producto/insumo, con scroll horizontal si es necesario */
+.detalleRow {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding: 8px;
+    background-color: white;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    flex-wrap: wrap;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: auto;
+}
+
+/* Inputs y selects en detalleRow: que no crezcan demasiado */
+.detalleRow select,
+.detalleRow input[type="number"] {
+    min-width: auto;
+    max-width: 260px;
+    width: 100%;
+    font-size: 15px;
+}
+
+.detalleRow button {
+    min-width: 32px;
+    max-width: 40px;
+}
+
+/* Mensaje cuando no hay productos */
+.noDetalles {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 20px;
+}
+
+/* Labels */
+.editarModalCol label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+    font-size: 14px;
+}
+
+/* Ajustes específicos para inputs en el modal de promociones */
+.editarModalCol .input {
+    margin-bottom: 8px;
+}
+
+/* Estilo para select de productos */
+.detalleRow select {
+    border-radius: 6px !important;
+    margin-bottom: 0 !important;
+}
+
+/* Estilo para input de cantidad */
+.detalleRow input[type="number"] {
+    border-radius: 6px !important;
+    margin-bottom: 0 !important;
+    text-align: center;
+}
+
+/* =========================
+VerItemModal.tsx
+========================= */
+
+/* Modal minimalista para VerItemModal */
+.verItemModalContent {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    padding: 24px 28px 18px 28px;
+    min-width: 320px;
+    max-width: 420px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Contenido scrollable del modal de ver items */
+.verItemScrollable {
+    max-height: 260px;
+    overflow-y: auto;
+    margin-bottom: 12px;
+    padding-right: 4px;
+}
+
+/* Título del modal de items */
+.verItemModalTitle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.verItemModalTitle h2 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+    color: #222;
+}
+
+/* Lista de productos/insumos */
+.verItemList {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 0 0;
+}
+
+.verItemList li {
+    padding: 6px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 15px;
+    color: #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.verItemList li:last-child {
+    border-bottom: none;
+}
+
+.verItemLabel {
+    font-weight: 500;
+    color: #222;
+}
+
+.verItemCantidad {
+    color: #888;
+    font-size: 14px;
+    margin-left: 6px;
+}
+
+.verItemPrecio {
+    color: #4A90E2;
+    font-size: 14px;
+    margin-left: 10px;
+}
+
+.verItemEmpty {
+    color: #aaa;
+    font-size: 14px;
+    margin: 10px 0;
+    text-align: left;
+}
+
+/* =========================
+Estilos para carga de imágenes en PromocionModal
+========================= */
+
+/* Contenedor para carga de imágenes */
+.imageUploadContainer {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Área de previsualización de imagen */
+.imagePreviewArea {
+    width: 150px;
+    height: 150px;
+    border: 1px dashed #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    background-color: #f8f8f8;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+/* Estilos para la imagen previsualizada */
+.imagePreview {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* Placeholder cuando no hay imagen */
+.noImagePlaceholder {
+    color: #999;
+    font-size: 14px;
+    text-align: center;
+}
+
+/* Botón para seleccionar imagen */
+.selectImageButton {
+    padding: 8px 16px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+/* Efecto hover para botón de imagen */
+.selectImageButton:hover {
+    background-color: #e0e0e0;
+}
+
+/* Estado deshabilitado del botón */
+.selectImageButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

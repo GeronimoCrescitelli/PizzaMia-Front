@@ -4,10 +4,16 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+
+  define: {
+    // Proporcionar un polyfill para 'global'
+    global: 'globalThis',
+  },
+  
   server: {
-    host: true,
-    allowedHosts: [
-      '9ba6-2803-9800-9843-69ad-9524-970-3763-3aaf.ngrok-free.app'
-    ]
+    proxy: {
+      '/api': 'http://localhost:8080', // Apunta al backend real
+    },
+    port: 5174
   }
 })
